@@ -5,7 +5,7 @@
     Prompt2 db 10,13,"Input Triangle Symbol: $"
     Newline db 10,13,"$"
 .code
-start:
+main:
     ; initialize data segment
     mov ax, @data
     mov ds, ax
@@ -19,10 +19,9 @@ start:
     ; set counter register to input number
     ; (subtract '0' from input ASCII character to get a number)
     sub al, '0'
-    ; xor cx, cx
+    xor cx, cx
     mov cl, al
     ; ask for triangle symbol
-    push cx
     mov ah, 9
     mov dx, OFFSET Prompt2
     int 21h
@@ -31,17 +30,16 @@ start:
     int 21h
     mov dl, al
     push dx
+    mov bx, 1
     mov ah, 9
     mov dx, OFFSET Newline
     int 21h
     pop dx
-    pop cx
-    mov bl, 1
-    ; outer loop. bl line number
+    ; outer loop. bx line number
     printLine:
     ; save our counter
     push cx
-    mov cl, bl
+    mov cx, bx
     ; inner loop
     ; for loop that will print the symbols
     printSymbol:
@@ -51,21 +49,20 @@ start:
     mov ah, 2
     int 21h
     pop bx
-    dec cl
+    pop dx
+    dec cx
     jnz printSymbol
     ; print new line
+    push dx
     mov ah, 9
     mov dx, OFFSET Newline
     int 21h
     pop dx
     pop cx
-    dec cl
-    inc bl
-    ; mov dl, cl
-    ; mov ah, 2
-    ; int 21h
+    inc bx
+    dec cx
     jnz printLine
     ; terminate program
     mov ax, 4c00h
     int 21h
-END start
+    END main
